@@ -1,22 +1,29 @@
-import { useEffect, useRef, useState } from "react"
+import { useMemo, useState } from "react"
 import { checkEmail, checkPassword } from "./validators"
 
 export function StateForm() {
 	// using State
 
 	const [email, setEmail] = useState("")
-	const [emailErrors, setEmailErrors] = useState([])
-
 	const [password, setPassword] = useState("")
-	const [passwordErrors, setPasswordErrors] = useState([])
+
+	const [isAfterFirstSubmit, setIsAfterFirstSubmit] = useState(false)
+
+	// using useMemo makes it so when the email changes, it doesn't rerun the checkPassord func and vise versa
+	const emailErrors = useMemo(() => {
+		return isAfterFirstSubmit ? checkEmail(email) : []
+	}, [isAfterFirstSubmit, email])
+
+	const passwordErrors = useMemo(() => {
+		return isAfterFirstSubmit ? checkPassword(password) : []
+	}, [isAfterFirstSubmit, password])
 
 	function onSubmit(e) {
 		e.preventDefault()
+		setIsAfterFirstSubmit(true)
+
 		const emailResults = checkEmail(email)
 		const passwordResults = checkPassword(password)
-
-		setEmailErrors(emailResults)
-		setPasswordErrors(passwordResults)
 
 		if (emailResults.length === 0 && passwordResults.length === 0) {
 			alert("Success")

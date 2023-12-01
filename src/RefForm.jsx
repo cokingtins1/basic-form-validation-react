@@ -1,14 +1,20 @@
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import { checkEmail, checkPassword } from "./validators"
 
 export function RefForm() {
-	const [password, setPassword] = useState("")
 	const [passwordErrors, setPasswordErrors] = useState([])
+	const [emailErrors, setEmailErrors] = useState([])
+	const [isAfterFirstSubmit, setIsAfterFirstSubmit] = useState(false)
+
+	const emailRef = useRef()
+	const passwordRef = useRef()
 
 	function onSubmit(e) {
 		e.preventDefault()
-		const emailResults = checkEmail(email)
-		const passwordResults = checkPassword(password)
+		setIsAfterFirstSubmit(true)
+
+		const emailResults = checkEmail(emailRef.current.value)
+		const passwordResults = checkPassword(passwordRef.current.value)
 
 		setEmailErrors(emailResults)
 		setPasswordErrors(passwordResults)
@@ -30,13 +36,14 @@ export function RefForm() {
 						Email
 					</label>
 					<input
+						onChange={(e) => {
+							isAfterFirstSubmit &&
+								setEmailErrors(checkEmail(e.target.value))
+						}}
 						className="input"
 						type="email"
 						id="email"
-						value={email}
-						onChange={(e) => {
-							setEmail(e.target.value)
-						}}
+						ref={emailRef}
 					/>
 					{emailErrors.length > 0 && (
 						<div className="msg">{emailErrors.join(",")}</div>
@@ -51,13 +58,14 @@ export function RefForm() {
 						Password
 					</label>
 					<input
+						onChange={(e) => {
+							isAfterFirstSubmit &&
+								setPasswordErrors(checkPassword(e.target.value))
+						}}
 						className="input"
 						type="password"
 						id="password"
-						value={password}
-						onChange={(e) => {
-							setPassword(e.target.value)
-						}}
+						ref={passwordRef}
 					/>
 					{passwordErrors.length > 0 && (
 						<div className="msg">{passwordErrors.join(",")}</div>
@@ -70,5 +78,3 @@ export function RefForm() {
 		</>
 	)
 }
-
-// this is some text
